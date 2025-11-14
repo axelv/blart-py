@@ -120,3 +120,34 @@ impl PyTreeMapItems {
         }
     }
 }
+
+/// Iterator for prefix queries - returns (key, value) tuples
+#[pyclass]
+pub struct PyPrefixIter {
+    items: Vec<(String, PyObject)>,
+    index: usize,
+}
+
+impl PyPrefixIter {
+    pub fn new(items: Vec<(String, PyObject)>) -> Self {
+        Self { items, index: 0 }
+    }
+}
+
+#[pymethods]
+impl PyPrefixIter {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>, py: Python) -> Option<(String, PyObject)> {
+        if slf.index < slf.items.len() {
+            let (key, value) = &slf.items[slf.index];
+            let result = (key.clone(), value.clone_ref(py));
+            slf.index += 1;
+            Some(result)
+        } else {
+            None
+        }
+    }
+}

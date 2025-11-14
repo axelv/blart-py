@@ -10,5 +10,6 @@ fn _blart(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<iterators::PyTreeMapKeys>()?;
     m.add_class::<iterators::PyTreeMapValues>()?;
     m.add_class::<iterators::PyTreeMapItems>()?;
+    m.add_class::<iterators::PyPrefixIter>()?;
     Ok(())
 }

@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use pyo3::exceptions::PyKeyError;
 use pyo3::types::{PyDict, PyList};
 use blart::TreeMap;
-use crate::iterators::{PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues, PyTreeMapItems};
+use crate::iterators::{PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues, PyTreeMapItems, PyPrefixIter};
 
 /// Adaptive radix tree implementation
 #[pyclass(name = "PyTreeMap")]
@@ -48,12 +48,12 @@ impl PyTreeMap {
     }
 
     /// Insert a key-value pair
+    ///
+    /// Uses force_insert which removes any conflicting prefix keys
+    /// to ensure insertion always succeeds.
     fn insert(&mut self, _py: Python, key: String, value: PyObject) -> PyResult<()> {
         let key_bytes = key.into_bytes().into_boxed_slice();
-        self.inner.try_insert(key_bytes, value)
-            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
-                format!("Failed to insert key: {:?}", e)
-            ))?;
+        self.inner.force_insert(key_bytes, value);
         Ok(())
     }
 
@@ -162,5 +162,35 @@ impl PyTreeMap {
             .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
             .collect();
         Ok(PyTreeMapItems::new(items))
+    }
+
+    /// Get the first key-value pair matching a prefix
+    ///
+    /// Returns None if no keys match the prefix, otherwise returns
+    /// a tuple of (key, value) for the first matching entry.
+    fn get_prefix(&self, py: Python, prefix: String) -> PyResult<Option<(String, PyObject)>> {
+        let prefix_bytes = prefix.as_bytes();
+        // Use prefix iterator to get the first matching key-value pair
+        let mut iter = self.inner.prefix(prefix_bytes);
+        match iter.next() {
+            Some((key, val)) => {
+                let key_str = String::from_utf8_lossy(key).into_owned();
+                Ok(Some((key_str, val.clone_ref(py))))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Get an iterator over all key-value pairs with a given prefix
+    ///
+    /// Returns an iterator that yields (key, value) tuples for all keys
+    /// that start with the given prefix, in lexicographic order.
+    fn prefix_iter(&self, py: Python, prefix: String) -> PyResult<PyPrefixIter> {
+        let prefix_bytes = prefix.as_bytes();
+        let items: Vec<(String, PyObject)> = self.inner
+            .prefix(prefix_bytes)
+            .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
+            .collect();
+        Ok(PyPrefixIter::new(items))
     }
 }
