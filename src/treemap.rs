@@ -44,7 +44,36 @@ fn levenshtein_distance(s1: &str, s2: &str) -> usize {
     matrix[len1][len2]
 }
 
-/// Adaptive radix tree implementation
+/// A high-performance adaptive radix tree (ART) implementation.
+///
+/// TreeMap is an ordered map data structure that stores key-value pairs.
+/// It provides efficient operations for:
+/// - Standard dictionary operations (insert, get, delete)
+/// - Prefix queries (find all keys starting with a prefix)
+/// - Fuzzy matching (find keys within edit distance)
+/// - Ordered iteration
+///
+/// # Performance
+/// - Insert: O(k) where k is key length
+/// - Get: O(k) where k is key length
+/// - Remove: O(k) where k is key length
+/// - Prefix query: O(k + m) where m is number of matches
+///
+/// # Examples
+/// ```python
+/// from blart import TreeMap
+///
+/// # Create a new TreeMap
+/// tree = TreeMap()
+/// tree["hello"] = "world"
+///
+/// # Create from dict
+/// tree = TreeMap({"apple": 1, "banana": 2})
+///
+/// # Prefix queries
+/// for key, value in tree.prefix_iter("app"):
+///     print(key, value)
+/// ```
 #[pyclass(name = "PyTreeMap")]
 pub struct PyTreeMap {
     inner: TreeMap<Box<[u8]>, PyObject>,
@@ -52,7 +81,25 @@ pub struct PyTreeMap {
 
 #[pymethods]
 impl PyTreeMap {
-    /// Create a new empty TreeMap or from initial data
+    /// Create a new TreeMap.
+    ///
+    /// Args:
+    ///     data: Optional initial data. Can be:
+    ///         - None: Creates an empty TreeMap
+    ///         - dict: Creates TreeMap from dictionary
+    ///         - list of tuples: Creates TreeMap from [(key, value), ...] pairs
+    ///
+    /// Returns:
+    ///     A new TreeMap instance
+    ///
+    /// Raises:
+    ///     ValueError: If data format is invalid
+    ///     TypeError: If keys are not strings
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap()
+    ///     >>> tree = TreeMap({"a": 1, "b": 2})
+    ///     >>> tree = TreeMap([("a", 1), ("b", 2)])
     #[new]
     #[pyo3(signature = (data=None))]
     fn new(py: Python, data: Option<&Bound<'_, PyAny>>) -> PyResult<Self> {
@@ -87,17 +134,43 @@ impl PyTreeMap {
         Ok(tree)
     }
 
-    /// Insert a key-value pair
+    /// Insert a key-value pair into the TreeMap.
     ///
-    /// Uses force_insert which removes any conflicting prefix keys
-    /// to ensure insertion always succeeds.
+    /// If the key already exists, its value is updated.
+    /// Note: Due to the adaptive radix tree structure, inserting a key may
+    /// remove existing keys that are prefixes of the new key.
+    ///
+    /// Args:
+    ///     key: String key to insert
+    ///     value: Python object to store
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap()
+    ///     >>> tree.insert("hello", "world")
+    ///     >>> tree.insert("hello", "universe")  # Updates value
     fn insert(&mut self, _py: Python, key: String, value: PyObject) -> PyResult<()> {
         let key_bytes = key.into_bytes().into_boxed_slice();
         self.inner.force_insert(key_bytes, value);
         Ok(())
     }
 
-    /// Get a value by key with optional default
+    /// Get a value by key, with optional default.
+    ///
+    /// Args:
+    ///     key: String key to look up
+    ///     default: Value to return if key not found (defaults to None)
+    ///
+    /// Returns:
+    ///     The value associated with the key, or default if not found
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"hello": "world"})
+    ///     >>> tree.get("hello")
+    ///     'world'
+    ///     >>> tree.get("missing")
+    ///     None
+    ///     >>> tree.get("missing", "default")
+    ///     'default'
     #[pyo3(signature = (key, default=None))]
     fn get(&self, py: Python, key: String, default: Option<PyObject>) -> PyResult<Option<PyObject>> {
         let key_bytes = key.as_bytes();
@@ -107,7 +180,22 @@ impl PyTreeMap {
         }
     }
 
-    /// Remove a key and return its value
+    /// Remove a key and return its value.
+    ///
+    /// Args:
+    ///     key: String key to remove
+    ///
+    /// Returns:
+    ///     The value that was associated with the key
+    ///
+    /// Raises:
+    ///     KeyError: If the key does not exist
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"hello": "world"})
+    ///     >>> tree.remove("hello")
+    ///     'world'
+    ///     >>> tree.remove("missing")  # Raises KeyError
     fn remove(&mut self, _py: Python, key: String) -> PyResult<PyObject> {
         let key_bytes = key.as_bytes();
         match self.inner.remove(key_bytes) {
@@ -116,18 +204,44 @@ impl PyTreeMap {
         }
     }
 
-    /// Clear all entries
+    /// Remove all entries from the TreeMap.
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"a": 1, "b": 2})
+    ///     >>> tree.clear()
+    ///     >>> len(tree)
+    ///     0
     fn clear(&mut self) -> PyResult<()> {
         self.inner.clear();
         Ok(())
     }
 
-    /// Check if TreeMap is empty
+    /// Check if the TreeMap contains no entries.
+    ///
+    /// Returns:
+    ///     True if the TreeMap is empty, False otherwise
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap()
+    ///     >>> tree.is_empty()
+    ///     True
+    ///     >>> tree["key"] = "value"
+    ///     >>> tree.is_empty()
+    ///     False
     fn is_empty(&self) -> PyResult<bool> {
         Ok(self.inner.is_empty())
     }
 
-    /// Get item using [] syntax
+    /// Get item using subscript notation (tree[key]).
+    ///
+    /// Args:
+    ///     key: String key to look up
+    ///
+    /// Returns:
+    ///     The value associated with the key
+    ///
+    /// Raises:
+    ///     KeyError: If the key does not exist
     fn __getitem__(&self, py: Python, key: String) -> PyResult<PyObject> {
         let key_bytes = key.as_bytes();
         match self.inner.get(key_bytes) {
@@ -136,39 +250,72 @@ impl PyTreeMap {
         }
     }
 
-    /// Set item using [] syntax
+    /// Set item using subscript notation (tree[key] = value).
+    ///
+    /// Args:
+    ///     key: String key
+    ///     value: Python object to store
     fn __setitem__(&mut self, py: Python, key: String, value: PyObject) -> PyResult<()> {
         self.insert(py, key, value)
     }
 
-    /// Delete item using del
+    /// Delete item using del statement (del tree[key]).
+    ///
+    /// Args:
+    ///     key: String key to delete
+    ///
+    /// Raises:
+    ///     KeyError: If the key does not exist
     fn __delitem__(&mut self, py: Python, key: String) -> PyResult<()> {
         self.remove(py, key)?;
         Ok(())
     }
 
-    /// Check if key exists using 'in' operator
+    /// Check if key exists using 'in' operator (key in tree).
+    ///
+    /// Args:
+    ///     key: String key to check
+    ///
+    /// Returns:
+    ///     True if key exists, False otherwise
     fn __contains__(&self, key: String) -> PyResult<bool> {
         let key_bytes = key.as_bytes();
         Ok(self.inner.contains_key(key_bytes))
     }
 
-    /// Get length of TreeMap
+    /// Get the number of entries in the TreeMap.
+    ///
+    /// Returns:
+    ///     Number of key-value pairs
     fn __len__(&self) -> PyResult<usize> {
         Ok(self.inner.len())
     }
 
-    /// String representation for debugging
+    /// Return a developer-friendly string representation.
+    ///
+    /// Returns:
+    ///     String like "TreeMap(len=5)"
     fn __repr__(&self) -> PyResult<String> {
         Ok(format!("TreeMap(len={})", self.inner.len()))
     }
 
-    /// String representation for display
+    /// Return a user-friendly string representation.
+    ///
+    /// Returns:
+    ///     String like "TreeMap with 5 entries"
     fn __str__(&self) -> PyResult<String> {
         Ok(format!("TreeMap with {} entries", self.inner.len()))
     }
 
-    /// Iterator support - iterate over keys
+    /// Return an iterator over keys in lexicographic order.
+    ///
+    /// Returns:
+    ///     Iterator that yields keys as strings
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1, "b": 2})
+    ///     >>> list(tree)
+    ///     ['a', 'b', 'c']
     fn __iter__(&self, _py: Python) -> PyResult<PyTreeMapIter> {
         let keys: Vec<String> = self.inner
             .iter()
@@ -177,7 +324,15 @@ impl PyTreeMap {
         Ok(PyTreeMapIter::new(keys))
     }
 
-    /// Get an iterator over keys
+    /// Return an iterator over all keys in lexicographic order.
+    ///
+    /// Returns:
+    ///     Iterator that yields keys as strings
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1, "b": 2})
+    ///     >>> list(tree.keys())
+    ///     ['a', 'b', 'c']
     fn keys(&self, _py: Python) -> PyResult<PyTreeMapKeys> {
         let keys: Vec<String> = self.inner
             .iter()
@@ -186,7 +341,15 @@ impl PyTreeMap {
         Ok(PyTreeMapKeys::new(keys))
     }
 
-    /// Get an iterator over values
+    /// Return an iterator over all values in key order.
+    ///
+    /// Returns:
+    ///     Iterator that yields values
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1, "b": 2})
+    ///     >>> list(tree.values())
+    ///     [1, 2, 3]
     fn values(&self, py: Python) -> PyResult<PyTreeMapValues> {
         let values: Vec<PyObject> = self.inner
             .iter()
@@ -195,7 +358,15 @@ impl PyTreeMap {
         Ok(PyTreeMapValues::new(values))
     }
 
-    /// Get an iterator over (key, value) pairs
+    /// Return an iterator over all (key, value) pairs in lexicographic order.
+    ///
+    /// Returns:
+    ///     Iterator that yields (key, value) tuples
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1})
+    ///     >>> list(tree.items())
+    ///     [('a', 1), ('c', 3)]
     fn items(&self, py: Python) -> PyResult<PyTreeMapItems> {
         let items: Vec<(String, PyObject)> = self.inner
             .iter()
@@ -204,10 +375,25 @@ impl PyTreeMap {
         Ok(PyTreeMapItems::new(items))
     }
 
-    /// Get the first key-value pair matching a prefix
+    /// Get the first key-value pair matching a prefix.
     ///
-    /// Returns None if no keys match the prefix, otherwise returns
-    /// a tuple of (key, value) for the first matching entry.
+    /// This is useful for quickly checking if any keys start with a given prefix,
+    /// or for getting a representative value for a prefix.
+    ///
+    /// Args:
+    ///     prefix: String prefix to search for
+    ///
+    /// Returns:
+    ///     (key, value) tuple for first match, or None if no match
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"apple": 1, "application": 2, "banana": 3})
+    ///     >>> tree.get_prefix("app")
+    ///     ('apple', 1)
+    ///     >>> tree.get_prefix("ban")
+    ///     ('banana', 3)
+    ///     >>> tree.get_prefix("xyz")
+    ///     None
     fn get_prefix(&self, py: Python, prefix: String) -> PyResult<Option<(String, PyObject)>> {
         let prefix_bytes = prefix.as_bytes();
         // Use prefix iterator to get the first matching key-value pair
@@ -221,10 +407,23 @@ impl PyTreeMap {
         }
     }
 
-    /// Get an iterator over all key-value pairs with a given prefix
+    /// Return an iterator over all key-value pairs with a given prefix.
     ///
-    /// Returns an iterator that yields (key, value) tuples for all keys
-    /// that start with the given prefix, in lexicographic order.
+    /// This is one of the key features of the adaptive radix tree - efficient
+    /// prefix queries that don't require scanning all keys.
+    ///
+    /// Args:
+    ///     prefix: String prefix to search for
+    ///
+    /// Returns:
+    ///     Iterator yielding (key, value) tuples for matching keys
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"apple": 1, "application": 2, "apply": 3, "banana": 4})
+    ///     >>> list(tree.prefix_iter("app"))
+    ///     [('apple', 1), ('application', 2), ('apply', 3)]
+    ///     >>> list(tree.prefix_iter(""))  # Empty prefix matches all
+    ///     [('apple', 1), ('application', 2), ('apply', 3), ('banana', 4)]
     fn prefix_iter(&self, py: Python, prefix: String) -> PyResult<PyPrefixIter> {
         let prefix_bytes = prefix.as_bytes();
         let items: Vec<(String, PyObject)> = self.inner
@@ -234,10 +433,20 @@ impl PyTreeMap {
         Ok(PyPrefixIter::new(items))
     }
 
-    /// Get the first (minimum) key-value pair
+    /// Get the first (lexicographically smallest) key-value pair.
     ///
-    /// Returns the first key-value pair in lexicographic order,
-    /// or None if the tree is empty.
+    /// Args:
+    ///     None
+    ///
+    /// Returns:
+    ///     (key, value) tuple for the first entry, or None if empty
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1, "b": 2})
+    ///     >>> tree.first()
+    ///     ('a', 1)
+    ///     >>> TreeMap().first()
+    ///     None
     fn first(&self, py: Python) -> PyResult<Option<(String, PyObject)>> {
         match self.inner.first_key_value() {
             Some((key, value)) => {
@@ -248,10 +457,20 @@ impl PyTreeMap {
         }
     }
 
-    /// Get the last (maximum) key-value pair
+    /// Get the last (lexicographically largest) key-value pair.
     ///
-    /// Returns the last key-value pair in lexicographic order,
-    /// or None if the tree is empty.
+    /// Args:
+    ///     None
+    ///
+    /// Returns:
+    ///     (key, value) tuple for the last entry, or None if empty
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1, "b": 2})
+    ///     >>> tree.last()
+    ///     ('c', 3)
+    ///     >>> TreeMap().last()
+    ///     None
     fn last(&self, py: Python) -> PyResult<Option<(String, PyObject)>> {
         match self.inner.last_key_value() {
             Some((key, value)) => {
@@ -262,10 +481,25 @@ impl PyTreeMap {
         }
     }
 
-    /// Remove and return the first (minimum) key-value pair
+    /// Remove and return the first (lexicographically smallest) key-value pair.
     ///
-    /// Returns and removes the first key-value pair in lexicographic order,
-    /// or None if the tree is empty.
+    /// This is useful for implementing queue-like behavior or for iteratively
+    /// processing elements in sorted order.
+    ///
+    /// Args:
+    ///     None
+    ///
+    /// Returns:
+    ///     (key, value) tuple for the first entry, or None if empty
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1, "b": 2})
+    ///     >>> tree.pop_first()
+    ///     ('a', 1)
+    ///     >>> tree.pop_first()
+    ///     ('b', 2)
+    ///     >>> len(tree)
+    ///     1
     fn pop_first(&mut self, _py: Python) -> PyResult<Option<(String, PyObject)>> {
         match self.inner.pop_first() {
             Some((key, value)) => {
@@ -276,10 +510,25 @@ impl PyTreeMap {
         }
     }
 
-    /// Remove and return the last (maximum) key-value pair
+    /// Remove and return the last (lexicographically largest) key-value pair.
     ///
-    /// Returns and removes the last key-value pair in lexicographic order,
-    /// or None if the tree is empty.
+    /// This is useful for implementing stack-like behavior or for iteratively
+    /// processing elements in reverse sorted order.
+    ///
+    /// Args:
+    ///     None
+    ///
+    /// Returns:
+    ///     (key, value) tuple for the last entry, or None if empty
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"c": 3, "a": 1, "b": 2})
+    ///     >>> tree.pop_last()
+    ///     ('c', 3)
+    ///     >>> tree.pop_last()
+    ///     ('b', 2)
+    ///     >>> len(tree)
+    ///     1
     fn pop_last(&mut self, _py: Python) -> PyResult<Option<(String, PyObject)>> {
         match self.inner.pop_last() {
             Some((key, value)) => {
@@ -290,14 +539,31 @@ impl PyTreeMap {
         }
     }
 
-    /// Fuzzy search for keys within a Levenshtein distance threshold
+    /// Find keys within a specified edit distance (Levenshtein distance).
     ///
-    /// Returns an iterator that yields (key, value, distance) tuples for all keys
-    /// within the specified Levenshtein distance from the search key.
+    /// This is useful for fuzzy matching, typo tolerance, and approximate
+    /// string searching. The Levenshtein distance counts the minimum number
+    /// of single-character edits (insertions, deletions, substitutions)
+    /// needed to transform one string into another.
     ///
-    /// # Arguments
-    /// * `key` - The search key to match against
-    /// * `max_distance` - Maximum Levenshtein distance (edit distance) allowed
+    /// Args:
+    ///     key: String to search for
+    ///     max_distance: Maximum edit distance allowed (must be non-negative)
+    ///
+    /// Returns:
+    ///     Iterator yielding (key, value, distance) tuples for all matches
+    ///
+    /// Raises:
+    ///     OverflowError: If max_distance is negative
+    ///
+    /// Examples:
+    ///     >>> tree = TreeMap({"hello": 1, "hallo": 2, "world": 3})
+    ///     >>> list(tree.fuzzy_search("hello", 0))
+    ///     [('hello', 1, 0)]
+    ///     >>> results = list(tree.fuzzy_search("hello", 1))
+    ///     >>> # Returns both "hello" (distance 0) and "hallo" (distance 1)
+    ///     >>> len(results)
+    ///     2
     fn fuzzy_search(&self, py: Python, key: String, max_distance: usize) -> PyResult<PyFuzzyIter> {
         let key_bytes = key.as_bytes();
         let items: Vec<(String, PyObject, usize)> = self.inner
