@@ -240,4 +240,136 @@ class TreeMap:
         """
         ...
 
+    def first(self) -> Optional[Tuple[str, Any]]:
+        """Get the first (minimum) key-value pair.
+
+        Returns the first key-value pair in lexicographic order,
+        or None if the tree is empty.
+
+        Returns:
+            A tuple of (key, value) for the first entry, or None if empty
+
+        Examples:
+            >>> tree = TreeMap()
+            >>> tree["cherry"] = 3
+            >>> tree["apple"] = 1
+            >>> tree["banana"] = 2
+            >>> tree.first()
+            ('apple', 1)
+            >>> TreeMap().first()
+            None
+        """
+        ...
+
+    def last(self) -> Optional[Tuple[str, Any]]:
+        """Get the last (maximum) key-value pair.
+
+        Returns the last key-value pair in lexicographic order,
+        or None if the tree is empty.
+
+        Returns:
+            A tuple of (key, value) for the last entry, or None if empty
+
+        Examples:
+            >>> tree = TreeMap()
+            >>> tree["apple"] = 1
+            >>> tree["cherry"] = 3
+            >>> tree["banana"] = 2
+            >>> tree.last()
+            ('cherry', 3)
+            >>> TreeMap().last()
+            None
+        """
+        ...
+
+    def pop_first(self) -> Optional[Tuple[str, Any]]:
+        """Remove and return the first (minimum) key-value pair.
+
+        Returns and removes the first key-value pair in lexicographic order,
+        or None if the tree is empty.
+
+        Returns:
+            A tuple of (key, value) for the first entry that was removed,
+            or None if empty
+
+        Examples:
+            >>> tree = TreeMap()
+            >>> tree["cherry"] = 3
+            >>> tree["apple"] = 1
+            >>> tree["banana"] = 2
+            >>> tree.pop_first()
+            ('apple', 1)
+            >>> len(tree)
+            2
+            >>> "apple" in tree
+            False
+        """
+        ...
+
+    def pop_last(self) -> Optional[Tuple[str, Any]]:
+        """Remove and return the last (maximum) key-value pair.
+
+        Returns and removes the last key-value pair in lexicographic order,
+        or None if the tree is empty.
+
+        Returns:
+            A tuple of (key, value) for the last entry that was removed,
+            or None if empty
+
+        Examples:
+            >>> tree = TreeMap()
+            >>> tree["apple"] = 1
+            >>> tree["cherry"] = 3
+            >>> tree["banana"] = 2
+            >>> tree.pop_last()
+            ('cherry', 3)
+            >>> len(tree)
+            2
+            >>> "cherry" in tree
+            False
+        """
+        ...
+
+    def fuzzy_search(self, key: str, max_distance: int) -> Iterator[Tuple[str, Any, int]]:
+        """Fuzzy search for keys within a Levenshtein distance threshold.
+
+        Returns an iterator that yields (key, value, distance) tuples for all keys
+        within the specified Levenshtein distance from the search key. The Levenshtein
+        distance (also known as edit distance) is the minimum number of single-character
+        edits (insertions, deletions, or substitutions) required to change one string
+        into another.
+
+        Args:
+            key: The search key to match against
+            max_distance: Maximum Levenshtein distance (edit distance) allowed
+
+        Returns:
+            An iterator over (key, value, distance) tuples where distance is the
+            Levenshtein distance from the search key
+
+        Examples:
+            >>> tree = TreeMap()
+            >>> tree["test"] = 1
+            >>> tree["text"] = 2
+            >>> tree["tent"] = 3
+            >>> tree["best"] = 4
+            >>> # Find all keys within distance 1 from "test"
+            >>> results = list(tree.fuzzy_search("test", 1))
+            >>> # Results include exact match (distance=0) and close matches
+            >>> for key, value, distance in results:
+            ...     print(f"{key}: {value} (distance={distance})")
+            test: 1 (distance=0)
+            text: 2 (distance=1)
+            best: 4 (distance=1)
+            >>> # Search for typo with distance 2
+            >>> list(tree.fuzzy_search("tset", 2))
+            [('test', 1, 2), ...]
+
+        Note:
+            The fuzzy search uses the Levenshtein distance algorithm to calculate
+            string similarity. Higher max_distance values will find more matches
+            but may be slower for large trees.
+        """
+        ...
+
 __all__ = ["TreeMap"]
