@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use pyo3::exceptions::{PyKeyError, PyNotImplementedError};
+use pyo3::exceptions::PyKeyError;
 use pyo3::types::{PyDict, PyList};
 use blart::TreeMap;
 
@@ -48,62 +48,82 @@ impl PyTreeMap {
 
     /// Insert a key-value pair
     fn insert(&mut self, _py: Python, key: String, value: PyObject) -> PyResult<()> {
-        Err(PyErr::new::<PyNotImplementedError, _>("insert not yet implemented"))
+        let key_bytes = key.into_bytes().into_boxed_slice();
+        self.inner.try_insert(key_bytes, value)
+            .map_err(|e| PyErr::new::<pyo3::exceptions::PyRuntimeError, _>(
+                format!("Failed to insert key: {:?}", e)
+            ))?;
+        Ok(())
     }
 
     /// Get a value by key with optional default
     #[pyo3(signature = (key, default=None))]
-    fn get(&self, _py: Python, key: String, default: Option<PyObject>) -> PyResult<Option<PyObject>> {
-        Err(PyErr::new::<PyNotImplementedError, _>("get not yet implemented"))
+    fn get(&self, py: Python, key: String, default: Option<PyObject>) -> PyResult<Option<PyObject>> {
+        let key_bytes = key.as_bytes();
+        match self.inner.get(key_bytes) {
+            Some(value) => Ok(Some(value.clone_ref(py))),
+            None => Ok(default.or_else(|| Some(py.None()))),
+        }
     }
 
     /// Remove a key and return its value
     fn remove(&mut self, _py: Python, key: String) -> PyResult<PyObject> {
-        Err(PyErr::new::<PyNotImplementedError, _>("remove not yet implemented"))
+        let key_bytes = key.as_bytes();
+        match self.inner.remove(key_bytes) {
+            Some(value) => Ok(value),
+            None => Err(PyErr::new::<PyKeyError, _>(format!("'{}'", key))),
+        }
     }
 
     /// Clear all entries
     fn clear(&mut self) -> PyResult<()> {
-        Err(PyErr::new::<PyNotImplementedError, _>("clear not yet implemented"))
+        self.inner.clear();
+        Ok(())
     }
 
     /// Check if TreeMap is empty
     fn is_empty(&self) -> PyResult<bool> {
-        Err(PyErr::new::<PyNotImplementedError, _>("is_empty not yet implemented"))
+        Ok(self.inner.is_empty())
     }
 
     /// Get item using [] syntax
-    fn __getitem__(&self, _py: Python, key: String) -> PyResult<PyObject> {
-        Err(PyErr::new::<PyNotImplementedError, _>("__getitem__ not yet implemented"))
+    fn __getitem__(&self, py: Python, key: String) -> PyResult<PyObject> {
+        let key_bytes = key.as_bytes();
+        match self.inner.get(key_bytes) {
+            Some(value) => Ok(value.clone_ref(py)),
+            None => Err(PyErr::new::<PyKeyError, _>(format!("'{}'", key))),
+        }
     }
 
     /// Set item using [] syntax
     fn __setitem__(&mut self, py: Python, key: String, value: PyObject) -> PyResult<()> {
-        Err(PyErr::new::<PyNotImplementedError, _>("__setitem__ not yet implemented"))
+        self.insert(py, key, value)
     }
 
     /// Delete item using del
-    fn __delitem__(&mut self, _py: Python, key: String) -> PyResult<()> {
-        Err(PyErr::new::<PyNotImplementedError, _>("__delitem__ not yet implemented"))
+    fn __delitem__(&mut self, py: Python, key: String) -> PyResult<()> {
+        self.remove(py, key)?;
+        Ok(())
     }
 
     /// Check if key exists using 'in' operator
     fn __contains__(&self, key: String) -> PyResult<bool> {
-        Err(PyErr::new::<PyNotImplementedError, _>("__contains__ not yet implemented"))
+        let key_bytes = key.as_bytes();
+        Ok(self.inner.contains_key(key_bytes))
     }
 
     /// Get length of TreeMap
     fn __len__(&self) -> PyResult<usize> {
-        Err(PyErr::new::<PyNotImplementedError, _>("__len__ not yet implemented"))
+        Ok(self.inner.len())
     }
 
     /// String representation for debugging
     fn __repr__(&self) -> PyResult<String> {
-        Err(PyErr::new::<PyNotImplementedError, _>("__repr__ not yet implemented"))
+        Ok(format!("TreeMap(len={})", self.inner.len()))
     }
 
     /// String representation for display
     fn __str__(&self) -> PyResult<String> {
-        Err(PyErr::new::<PyNotImplementedError, _>("__str__ not yet implemented"))
+        Ok(format!("TreeMap with {} entries", self.inner.len()))
     }
 }
