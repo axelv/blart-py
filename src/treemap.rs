@@ -2,6 +2,7 @@ use pyo3::prelude::*;
 use pyo3::exceptions::PyKeyError;
 use pyo3::types::{PyDict, PyList};
 use blart::TreeMap;
+use crate::iterators::{PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues, PyTreeMapItems};
 
 /// Adaptive radix tree implementation
 #[pyclass(name = "PyTreeMap")]
@@ -125,5 +126,41 @@ impl PyTreeMap {
     /// String representation for display
     fn __str__(&self) -> PyResult<String> {
         Ok(format!("TreeMap with {} entries", self.inner.len()))
+    }
+
+    /// Iterator support - iterate over keys
+    fn __iter__(&self, _py: Python) -> PyResult<PyTreeMapIter> {
+        let keys: Vec<String> = self.inner
+            .iter()
+            .map(|(k, _)| String::from_utf8_lossy(k).into_owned())
+            .collect();
+        Ok(PyTreeMapIter::new(keys))
+    }
+
+    /// Get an iterator over keys
+    fn keys(&self, _py: Python) -> PyResult<PyTreeMapKeys> {
+        let keys: Vec<String> = self.inner
+            .iter()
+            .map(|(k, _)| String::from_utf8_lossy(k).into_owned())
+            .collect();
+        Ok(PyTreeMapKeys::new(keys))
+    }
+
+    /// Get an iterator over values
+    fn values(&self, py: Python) -> PyResult<PyTreeMapValues> {
+        let values: Vec<PyObject> = self.inner
+            .iter()
+            .map(|(_, v)| v.clone_ref(py))
+            .collect();
+        Ok(PyTreeMapValues::new(values))
+    }
+
+    /// Get an iterator over (key, value) pairs
+    fn items(&self, py: Python) -> PyResult<PyTreeMapItems> {
+        let items: Vec<(String, PyObject)> = self.inner
+            .iter()
+            .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
+            .collect();
+        Ok(PyTreeMapItems::new(items))
     }
 }
