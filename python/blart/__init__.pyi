@@ -1,6 +1,6 @@
 """Type stubs for blart package."""
 
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union, overload
 
 class TreeMap:
     """Adaptive radix tree implementation using an adaptive radix tree (ART).
@@ -142,6 +142,38 @@ class TreeMap:
 
     def __str__(self) -> str:
         """Get a human-readable string representation."""
+        ...
+
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over keys in the TreeMap.
+
+        Returns:
+            An iterator over the keys in lexicographic order
+        """
+        ...
+
+    def keys(self) -> Iterator[str]:
+        """Get an iterator over keys.
+
+        Returns:
+            An iterator over the keys in lexicographic order
+        """
+        ...
+
+    def values(self) -> Iterator[Any]:
+        """Get an iterator over values.
+
+        Returns:
+            An iterator over the values in key order
+        """
+        ...
+
+    def items(self) -> Iterator[Tuple[str, Any]]:
+        """Get an iterator over (key, value) pairs.
+
+        Returns:
+            An iterator over (key, value) tuples in key order
+        """
         ...
 
 __all__ = ["TreeMap"]
