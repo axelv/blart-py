@@ -151,3 +151,34 @@ impl PyPrefixIter {
         }
     }
 }
+
+/// Iterator for fuzzy search - returns (key, value, distance) tuples
+#[pyclass]
+pub struct PyFuzzyIter {
+    items: Vec<(String, PyObject, usize)>,
+    index: usize,
+}
+
+impl PyFuzzyIter {
+    pub fn new(items: Vec<(String, PyObject, usize)>) -> Self {
+        Self { items, index: 0 }
+    }
+}
+
+#[pymethods]
+impl PyFuzzyIter {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>, py: Python) -> Option<(String, PyObject, usize)> {
+        if slf.index < slf.items.len() {
+            let (key, value, distance) = &slf.items[slf.index];
+            let result = (key.clone(), value.clone_ref(py), *distance);
+            slf.index += 1;
+            Some(result)
+        } else {
+            None
+        }
+    }
+}
