@@ -1,9 +1,147 @@
 """Type stubs for blart package."""
 
-from typing import Any
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, overload
 
 class TreeMap:
-    """Adaptive radix tree implementation."""
-    def __init__(self) -> None: ...
+    """Adaptive radix tree implementation using an adaptive radix tree (ART).
+
+    TreeMap provides a dictionary-like interface with efficient operations
+    for string keys. It supports all standard dict operations plus advanced
+    features like prefix queries.
+
+    Examples:
+        >>> tree = TreeMap()
+        >>> tree["apple"] = 1
+        >>> tree["banana"] = 2
+        >>> print(tree["apple"])
+        1
+        >>> "banana" in tree
+        True
+        >>> len(tree)
+        2
+    """
+
+    @overload
+    def __init__(self) -> None:
+        """Create an empty TreeMap."""
+        ...
+
+    @overload
+    def __init__(self, data: Dict[str, Any]) -> None:
+        """Create a TreeMap from a dictionary."""
+        ...
+
+    @overload
+    def __init__(self, data: Iterable[Tuple[str, Any]]) -> None:
+        """Create a TreeMap from an iterable of (key, value) tuples."""
+        ...
+
+    def insert(self, key: str, value: Any) -> None:
+        """Insert or update a key-value pair.
+
+        Args:
+            key: The key to insert (must be a string)
+            value: The value to associate with the key
+        """
+        ...
+
+    def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
+        """Get a value by key with optional default.
+
+        Args:
+            key: The key to look up
+            default: Value to return if key is not found (default: None)
+
+        Returns:
+            The value associated with the key, or default if not found
+        """
+        ...
+
+    def remove(self, key: str) -> Any:
+        """Remove a key and return its value.
+
+        Args:
+            key: The key to remove
+
+        Returns:
+            The value that was associated with the key
+
+        Raises:
+            KeyError: If the key does not exist
+        """
+        ...
+
+    def clear(self) -> None:
+        """Remove all entries from the TreeMap."""
+        ...
+
+    def is_empty(self) -> bool:
+        """Check if the TreeMap is empty.
+
+        Returns:
+            True if the TreeMap has no entries, False otherwise
+        """
+        ...
+
+    def __getitem__(self, key: str) -> Any:
+        """Get a value using square bracket notation.
+
+        Args:
+            key: The key to look up
+
+        Returns:
+            The value associated with the key
+
+        Raises:
+            KeyError: If the key does not exist
+        """
+        ...
+
+    def __setitem__(self, key: str, value: Any) -> None:
+        """Set a value using square bracket notation.
+
+        Args:
+            key: The key to set
+            value: The value to associate with the key
+        """
+        ...
+
+    def __delitem__(self, key: str) -> None:
+        """Delete a key using del statement.
+
+        Args:
+            key: The key to delete
+
+        Raises:
+            KeyError: If the key does not exist
+        """
+        ...
+
+    def __contains__(self, key: str) -> bool:
+        """Check if a key exists using 'in' operator.
+
+        Args:
+            key: The key to check
+
+        Returns:
+            True if the key exists, False otherwise
+        """
+        ...
+
+    def __len__(self) -> int:
+        """Get the number of entries in the TreeMap.
+
+        Returns:
+            The number of key-value pairs
+        """
+        ...
+
+    def __repr__(self) -> str:
+        """Get a debug string representation."""
+        ...
+
+    def __str__(self) -> str:
+        """Get a human-readable string representation."""
+        ...
 
 __all__ = ["TreeMap"]
