@@ -2,7 +2,47 @@ use pyo3::prelude::*;
 use pyo3::exceptions::PyKeyError;
 use pyo3::types::{PyDict, PyList};
 use blart::TreeMap;
-use crate::iterators::{PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues, PyTreeMapItems, PyPrefixIter};
+use crate::iterators::{PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues, PyTreeMapItems, PyPrefixIter, PyFuzzyIter};
+
+/// Calculate Levenshtein distance between two strings
+fn levenshtein_distance(s1: &str, s2: &str) -> usize {
+    let len1 = s1.chars().count();
+    let len2 = s2.chars().count();
+
+    if len1 == 0 {
+        return len2;
+    }
+    if len2 == 0 {
+        return len1;
+    }
+
+    let mut matrix = vec![vec![0; len2 + 1]; len1 + 1];
+
+    for i in 0..=len1 {
+        matrix[i][0] = i;
+    }
+    for j in 0..=len2 {
+        matrix[0][j] = j;
+    }
+
+    let s1_chars: Vec<char> = s1.chars().collect();
+    let s2_chars: Vec<char> = s2.chars().collect();
+
+    for i in 1..=len1 {
+        for j in 1..=len2 {
+            let cost = if s1_chars[i - 1] == s2_chars[j - 1] { 0 } else { 1 };
+            matrix[i][j] = std::cmp::min(
+                std::cmp::min(
+                    matrix[i - 1][j] + 1,      // deletion
+                    matrix[i][j - 1] + 1       // insertion
+                ),
+                matrix[i - 1][j - 1] + cost    // substitution
+            );
+        }
+    }
+
+    matrix[len1][len2]
+}
 
 /// Adaptive radix tree implementation
 #[pyclass(name = "PyTreeMap")]
@@ -192,5 +232,82 @@ impl PyTreeMap {
             .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
             .collect();
         Ok(PyPrefixIter::new(items))
+    }
+
+    /// Get the first (minimum) key-value pair
+    ///
+    /// Returns the first key-value pair in lexicographic order,
+    /// or None if the tree is empty.
+    fn first(&self, py: Python) -> PyResult<Option<(String, PyObject)>> {
+        match self.inner.first_key_value() {
+            Some((key, value)) => {
+                let key_str = String::from_utf8_lossy(key).into_owned();
+                Ok(Some((key_str, value.clone_ref(py))))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Get the last (maximum) key-value pair
+    ///
+    /// Returns the last key-value pair in lexicographic order,
+    /// or None if the tree is empty.
+    fn last(&self, py: Python) -> PyResult<Option<(String, PyObject)>> {
+        match self.inner.last_key_value() {
+            Some((key, value)) => {
+                let key_str = String::from_utf8_lossy(key).into_owned();
+                Ok(Some((key_str, value.clone_ref(py))))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Remove and return the first (minimum) key-value pair
+    ///
+    /// Returns and removes the first key-value pair in lexicographic order,
+    /// or None if the tree is empty.
+    fn pop_first(&mut self, _py: Python) -> PyResult<Option<(String, PyObject)>> {
+        match self.inner.pop_first() {
+            Some((key, value)) => {
+                let key_str = String::from_utf8_lossy(&key).into_owned();
+                Ok(Some((key_str, value)))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Remove and return the last (maximum) key-value pair
+    ///
+    /// Returns and removes the last key-value pair in lexicographic order,
+    /// or None if the tree is empty.
+    fn pop_last(&mut self, _py: Python) -> PyResult<Option<(String, PyObject)>> {
+        match self.inner.pop_last() {
+            Some((key, value)) => {
+                let key_str = String::from_utf8_lossy(&key).into_owned();
+                Ok(Some((key_str, value)))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Fuzzy search for keys within a Levenshtein distance threshold
+    ///
+    /// Returns an iterator that yields (key, value, distance) tuples for all keys
+    /// within the specified Levenshtein distance from the search key.
+    ///
+    /// # Arguments
+    /// * `key` - The search key to match against
+    /// * `max_distance` - Maximum Levenshtein distance (edit distance) allowed
+    fn fuzzy_search(&self, py: Python, key: String, max_distance: usize) -> PyResult<PyFuzzyIter> {
+        let key_bytes = key.as_bytes();
+        let items: Vec<(String, PyObject, usize)> = self.inner
+            .fuzzy(key_bytes, max_distance)
+            .map(|(k, v)| {
+                let key_str = String::from_utf8_lossy(k).into_owned();
+                let distance = levenshtein_distance(&key, &key_str);
+                (key_str, v.clone_ref(py), distance)
+            })
+            .collect();
+        Ok(PyFuzzyIter::new(items))
     }
 }

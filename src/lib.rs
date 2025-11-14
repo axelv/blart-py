@@ -11,5 +11,6 @@ fn _blart(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<iterators::PyTreeMapValues>()?;
     m.add_class::<iterators::PyTreeMapItems>()?;
     m.add_class::<iterators::PyPrefixIter>()?;
+    m.add_class::<iterators::PyFuzzyIter>()?;
     Ok(())
 }
