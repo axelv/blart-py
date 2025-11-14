@@ -176,4 +176,68 @@ class TreeMap:
         """
         ...
 
+    def get_prefix(self, prefix: str) -> Optional[Tuple[str, Any]]:
+        """Get the first key-value pair matching a prefix.
+
+        Returns the first key-value pair where the key starts with the given prefix,
+        in lexicographic order. Returns None if no keys match the prefix.
+
+        Args:
+            prefix: The prefix to search for
+
+        Returns:
+            A tuple of (key, value) for the first matching entry, or None if no match
+
+        Examples:
+            >>> tree = TreeMap()
+            >>> tree["apple"] = 1
+            >>> tree["application"] = 2
+            >>> tree["banana"] = 3
+            >>> tree.get_prefix("app")
+            ('apple', 1)
+            >>> tree.get_prefix("ban")
+            ('banana', 3)
+            >>> tree.get_prefix("orange")
+            None
+
+        Note:
+            Due to blart's adaptive radix tree design with prefix compression,
+            when a key is a prefix of another key, inserting the longer key will
+            remove the shorter prefix key. This is expected behavior.
+        """
+        ...
+
+    def prefix_iter(self, prefix: str) -> Iterator[Tuple[str, Any]]:
+        """Get an iterator over all key-value pairs with a given prefix.
+
+        Returns an iterator that yields (key, value) tuples for all keys
+        that start with the given prefix, in lexicographic order.
+
+        Args:
+            prefix: The prefix to search for
+
+        Returns:
+            An iterator over (key, value) tuples matching the prefix
+
+        Examples:
+            >>> tree = TreeMap()
+            >>> tree["apple"] = 1
+            >>> tree["application"] = 2
+            >>> tree["apply"] = 3
+            >>> tree["banana"] = 4
+            >>> for key, value in tree.prefix_iter("app"):
+            ...     print(f"{key}: {value}")
+            apple: 1
+            application: 2
+            apply: 3
+            >>> list(tree.prefix_iter("ban"))
+            [('banana', 4)]
+            >>> list(tree.prefix_iter("orange"))
+            []
+
+        Note:
+            An empty prefix ("") matches all keys in the tree.
+        """
+        ...
+
 __all__ = ["TreeMap"]
