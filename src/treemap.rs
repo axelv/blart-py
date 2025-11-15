@@ -85,7 +85,7 @@ fn levenshtein_distance(s1: &str, s2: &str) -> usize {
 /// ```
 #[pyclass(name = "PyTreeMap")]
 pub struct PyTreeMap {
-    inner: TreeMap<Box<[u8]>, PyObject>,
+    inner: TreeMap<Box<[u8]>, Py<PyAny>>,
 }
 
 #[pymethods]
@@ -118,23 +118,23 @@ impl PyTreeMap {
 
         if let Some(data) = data {
             // Try to interpret as dict
-            if let Ok(dict) = data.downcast::<PyDict>() {
+            if let Ok(dict) = data.cast_exact::<PyDict>() {
                 for (key, value) in dict.iter() {
                     let key_str: String = key.extract()?;
-                    tree.insert(py, key_str, value.to_object(py))?;
+                    tree.insert(py, key_str, value.clone().unbind())?;
                 }
             }
             // Try to interpret as list of tuples
-            else if let Ok(list) = data.downcast::<PyList>() {
+            else if let Ok(list) = data.cast_exact::<PyList>() {
                 for item in list.iter() {
-                    let tuple = item.downcast::<pyo3::types::PyTuple>()?;
+                    let tuple = item.cast_exact::<pyo3::types::PyTuple>()?;
                     if tuple.len() != 2 {
                         return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
                             "Items must be (key, value) tuples",
                         ));
                     }
                     let key_str: String = tuple.get_item(0)?.extract()?;
-                    let value = tuple.get_item(1)?.to_object(py);
+                    let value = tuple.get_item(1)?.clone().unbind();
                     tree.insert(py, key_str, value)?;
                 }
             }
@@ -157,7 +157,7 @@ impl PyTreeMap {
     ///     >>> tree = TreeMap()
     ///     >>> tree.insert("hello", "world")
     ///     >>> tree.insert("hello", "universe")  # Updates value
-    fn insert(&mut self, _py: Python, key: String, value: PyObject) -> PyResult<()> {
+    fn insert(&mut self, _py: Python, key: String, value: Py<PyAny>) -> PyResult<()> {
         let key_bytes = key.into_bytes().into_boxed_slice();
         self.inner.force_insert(key_bytes, value);
         Ok(())
@@ -185,8 +185,8 @@ impl PyTreeMap {
         &self,
         py: Python,
         key: String,
-        default: Option<PyObject>,
-    ) -> PyResult<Option<PyObject>> {
+        default: Option<Py<PyAny>>,
+    ) -> PyResult<Option<Py<PyAny>>> {
         let key_bytes = key.as_bytes();
         match self.inner.get(key_bytes) {
             Some(value) => Ok(Some(value.clone_ref(py))),
@@ -210,7 +210,7 @@ impl PyTreeMap {
     ///     >>> tree.remove("hello")
     ///     'world'
     ///     >>> tree.remove("missing")  # Raises KeyError
-    fn remove(&mut self, _py: Python, key: String) -> PyResult<PyObject> {
+    fn remove(&mut self, _py: Python, key: String) -> PyResult<Py<PyAny>> {
         let key_bytes = key.as_bytes();
         match self.inner.remove(key_bytes) {
             Some(value) => Ok(value),
@@ -256,7 +256,7 @@ impl PyTreeMap {
     ///
     /// Raises:
     ///     KeyError: If the key does not exist
-    fn __getitem__(&self, py: Python, key: String) -> PyResult<PyObject> {
+    fn __getitem__(&self, py: Python, key: String) -> PyResult<Py<PyAny>> {
         let key_bytes = key.as_bytes();
         match self.inner.get(key_bytes) {
             Some(value) => Ok(value.clone_ref(py)),
@@ -269,7 +269,7 @@ impl PyTreeMap {
     /// Args:
     ///     key: String key
     ///     value: Python object to store
-    fn __setitem__(&mut self, py: Python, key: String, value: PyObject) -> PyResult<()> {
+    fn __setitem__(&mut self, py: Python, key: String, value: Py<PyAny>) -> PyResult<()> {
         self.insert(py, key, value)
     }
 
@@ -367,7 +367,7 @@ impl PyTreeMap {
     ///     >>> list(tree.values())
     ///     [1, 2, 3]
     fn values(&self, py: Python) -> PyResult<PyTreeMapValues> {
-        let values: Vec<PyObject> = self.inner.iter().map(|(_, v)| v.clone_ref(py)).collect();
+        let values: Vec<Py<PyAny>> = self.inner.iter().map(|(_, v)| v.clone_ref(py)).collect();
         Ok(PyTreeMapValues::new(values))
     }
 
@@ -381,7 +381,7 @@ impl PyTreeMap {
     ///     >>> list(tree.items())
     ///     [('a', 1), ('c', 3)]
     fn items(&self, py: Python) -> PyResult<PyTreeMapItems> {
-        let items: Vec<(String, PyObject)> = self
+        let items: Vec<(String, Py<PyAny>)> = self
             .inner
             .iter()
             .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
@@ -408,7 +408,7 @@ impl PyTreeMap {
     ///     ('banana', 3)
     ///     >>> tree.get_prefix("xyz")
     ///     None
-    fn get_prefix(&self, py: Python, prefix: String) -> PyResult<Option<(String, PyObject)>> {
+    fn get_prefix(&self, py: Python, prefix: String) -> PyResult<Option<(String, Py<PyAny>)>> {
         let prefix_bytes = prefix.as_bytes();
         // Use prefix iterator to get the first matching key-value pair
         let mut iter = self.inner.prefix(prefix_bytes);
@@ -440,7 +440,7 @@ impl PyTreeMap {
     ///     [('apple', 1), ('application', 2), ('apply', 3), ('banana', 4)]
     fn prefix_iter(&self, py: Python, prefix: String) -> PyResult<PyPrefixIter> {
         let prefix_bytes = prefix.as_bytes();
-        let items: Vec<(String, PyObject)> = self
+        let items: Vec<(String, Py<PyAny>)> = self
             .inner
             .prefix(prefix_bytes)
             .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
@@ -462,7 +462,7 @@ impl PyTreeMap {
     ///     ('a', 1)
     ///     >>> TreeMap().first()
     ///     None
-    fn first(&self, py: Python) -> PyResult<Option<(String, PyObject)>> {
+    fn first(&self, py: Python) -> PyResult<Option<(String, Py<PyAny>)>> {
         match self.inner.first_key_value() {
             Some((key, value)) => {
                 let key_str = String::from_utf8_lossy(key).into_owned();
@@ -486,7 +486,7 @@ impl PyTreeMap {
     ///     ('c', 3)
     ///     >>> TreeMap().last()
     ///     None
-    fn last(&self, py: Python) -> PyResult<Option<(String, PyObject)>> {
+    fn last(&self, py: Python) -> PyResult<Option<(String, Py<PyAny>)>> {
         match self.inner.last_key_value() {
             Some((key, value)) => {
                 let key_str = String::from_utf8_lossy(key).into_owned();
@@ -515,7 +515,7 @@ impl PyTreeMap {
     ///     ('b', 2)
     ///     >>> len(tree)
     ///     1
-    fn pop_first(&mut self, _py: Python) -> PyResult<Option<(String, PyObject)>> {
+    fn pop_first(&mut self, _py: Python) -> PyResult<Option<(String, Py<PyAny>)>> {
         match self.inner.pop_first() {
             Some((key, value)) => {
                 let key_str = String::from_utf8_lossy(&key).into_owned();
@@ -544,7 +544,7 @@ impl PyTreeMap {
     ///     ('b', 2)
     ///     >>> len(tree)
     ///     1
-    fn pop_last(&mut self, _py: Python) -> PyResult<Option<(String, PyObject)>> {
+    fn pop_last(&mut self, _py: Python) -> PyResult<Option<(String, Py<PyAny>)>> {
         match self.inner.pop_last() {
             Some((key, value)) => {
                 let key_str = String::from_utf8_lossy(&key).into_owned();
@@ -581,7 +581,7 @@ impl PyTreeMap {
     ///     2
     fn fuzzy_search(&self, py: Python, key: String, max_distance: usize) -> PyResult<PyFuzzyIter> {
         let key_bytes = key.as_bytes();
-        let items: Vec<(String, PyObject, usize)> = self
+        let items: Vec<(String, Py<PyAny>, usize)> = self
             .inner
             .fuzzy(key_bytes, max_distance)
             .map(|(k, v)| {
