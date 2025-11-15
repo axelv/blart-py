@@ -22,6 +22,53 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Extract version from tag
+      id: get_version
+      shell: bash
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          VERSION="0.1.0-dev"
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+
+    - name: Update version in project files
+      shell: python
+      run: |
+        import re
+        version = "${{ steps.get_version.outputs.VERSION }}"
+
+        # Update Cargo.toml
+        with open("Cargo.toml", "r") as f:
+            cargo_content = f.read()
+        cargo_content = re.sub(r'^version = ".*"', f'version = "{version}"', cargo_content, flags=re.MULTILINE)
+        with open("Cargo.toml", "w") as f:
+            f.write(cargo_content)
+
+        # Update pyproject.toml
+        with open("pyproject.toml", "r") as f:
+            pyproject_content = f.read()
+        pyproject_content = re.sub(r'^version = ".*"', f'version = "{version}"', pyproject_content, flags=re.MULTILINE)
+        with open("pyproject.toml", "w") as f:
+            f.write(pyproject_content)
+
+        print(f"Updated version to {version}")
+
+        # Verify updates
+        with open("Cargo.toml", "r") as f:
+            for line in f:
+                if line.startswith("version"):
+                    print(f"Cargo.toml: {line.strip()}")
+                    break
+
+        with open("pyproject.toml", "r") as f:
+            for line in f:
+                if line.startswith("version"):
+                    print(f"pyproject.toml: {line.strip()}")
+                    break
+
     - name: Set up Rust
       uses: dtolnay/rust-toolchain@stable
 
@@ -64,6 +111,53 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
+
+    - name: Extract version from tag
+      id: get_version
+      shell: bash
+      run: |
+        if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          VERSION="0.1.0-dev"
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+
+    - name: Update version in project files
+      shell: python
+      run: |
+        import re
+        version = "${{ steps.get_version.outputs.VERSION }}"
+
+        # Update Cargo.toml
+        with open("Cargo.toml", "r") as f:
+            cargo_content = f.read()
+        cargo_content = re.sub(r'^version = ".*"', f'version = "{version}"', cargo_content, flags=re.MULTILINE)
+        with open("Cargo.toml", "w") as f:
+            f.write(cargo_content)
+
+        # Update pyproject.toml
+        with open("pyproject.toml", "r") as f:
+            pyproject_content = f.read()
+        pyproject_content = re.sub(r'^version = ".*"', f'version = "{version}"', pyproject_content, flags=re.MULTILINE)
+        with open("pyproject.toml", "w") as f:
+            f.write(pyproject_content)
+
+        print(f"Updated version to {version}")
+
+        # Verify updates
+        with open("Cargo.toml", "r") as f:
+            for line in f:
+                if line.startswith("version"):
+                    print(f"Cargo.toml: {line.strip()}")
+                    break
+
+        with open("pyproject.toml", "r") as f:
+            for line in f:
+                if line.startswith("version"):
+                    print(f"pyproject.toml: {line.strip()}")
+                    break
 
     - name: Install maturin
       run: pip install maturin
