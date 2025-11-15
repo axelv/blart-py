@@ -2,7 +2,6 @@
 
 import gc
 import sys
-import pytest
 from blart import TreeMap
 
 

@@ -5,7 +5,6 @@ of TreeMap operations compared to Python's built-in dict.
 """
 
 import time
-import pytest
 from blart import TreeMap
 
 
@@ -171,8 +170,8 @@ def test_benchmark_prefix_query():
         print(f"  Speedup: {dict_time/treemap_time:.1f}x faster (TreeMap wins)")
     else:
         print(f"  TreeMap: {treemap_time/dict_time:.1f}x slower")
-    print(f"  Note: TreeMap provides structured prefix queries,")
-    print(f"        while dict requires O(n) linear scan")
+    print("  Note: TreeMap provides structured prefix queries,")
+    print("        while dict requires O(n) linear scan")
     print(f"{'='*60}")
 
     # Both should complete reasonably fast
@@ -354,7 +353,7 @@ def test_benchmark_mixed_operations():
     print(f"\n{'='*60}")
     print(f"Mixed workload ({n} items):")
     print(f"  Total time: {mixed_time*1000:.2f} ms")
-    print(f"  Operations: insert, access, prefix, delete, iterate")
+    print("  Operations: insert, access, prefix, delete, iterate")
     print(f"{'='*60}")
 
     assert mixed_time < 1.0, "Mixed workload too slow"

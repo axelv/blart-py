@@ -1,6 +1,5 @@
 """Tests for prefix query functionality."""
 
-import pytest
 from blart import TreeMap
 
 

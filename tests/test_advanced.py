@@ -1,6 +1,5 @@
 """Tests for advanced features: boundary operations and fuzzy search."""
 
-import pytest
 from blart import TreeMap
 
 

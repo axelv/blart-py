@@ -73,5 +73,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Makefile for common development tasks
 - CI/CD with automated testing and wheel building
 
-[Unreleased]: https://github.com/yourusername/blart-py/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/blart-py/releases/tag/v0.1.0
+[Unreleased]: https://github.com/axelv/blart-py/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/axelv/blart-py/releases/tag/v0.1.0
