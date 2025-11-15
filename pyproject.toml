@@ -3,7 +3,7 @@ requires = ["maturin>=1.0,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "blart"
+name = "blart-py"
 version = "0.1.0"
 description = "High-performance adaptive radix tree (ART) for Python with prefix queries and fuzzy search"
 readme = "README.md"

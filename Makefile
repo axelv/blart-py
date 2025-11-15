@@ -17,7 +17,7 @@ test:  ## Run tests
 	pytest tests/ -v
 
 test-cov:  ## Run tests with coverage report
-	pytest tests/ -v --cov=blart --cov-report=term-missing --cov-report=html
+	pytest tests/ -v --cov=blart-py --cov-report=term-missing --cov-report=html
 
 test-watch:  ## Run tests in watch mode (requires pytest-watch)
 	ptw tests/ -- -v

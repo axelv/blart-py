@@ -408,7 +408,7 @@ Each phase follows the TDD cycle:
    - **Commit**: `"test: add performance benchmarks"`
 
 4. **Test coverage report**:
-   - Run `pytest --cov=blart tests/`
+   - Run `pytest --cov=blart-py tests/`
    - Ensure >90% coverage
    - Add coverage badge to README if desired
    - **Commit**: `"test: verify >90% test coverage"`
@@ -655,7 +655,7 @@ pytest tests/
 pytest tests/test_basic.py -v
 
 # Run tests with coverage
-pytest --cov=blart tests/
+pytest --cov=blart-py tests/
 
 # Run tests matching pattern
 pytest tests/ -k "test_insert"
@@ -781,7 +781,7 @@ module-name = "blart._blart"
 - [ ] Iteration performance acceptable
 
 ### User Experience
-- [ ] Installation via `pip install blart` works
+- [ ] Installation via `pip install blart-py` works
 - [ ] API intuitive for Python developers
 - [ ] Error messages clear and actionable
 - [ ] Examples run without modification

@@ -45,10 +45,10 @@ jobs:
 
     - name: Install wheel (Windows)
       if: runner.os == 'Windows'
-      run: pip install --find-links=target/wheels --no-index blart
+      run: pip install --find-links=target/wheels --no-index blart-py
 
     - name: Run tests
-      run: pytest tests/ -v --cov=blart --cov-report=xml
+      run: pytest tests/ -v --cov=blart-py --cov-report=xml
 
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'

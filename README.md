@@ -16,7 +16,7 @@ A high-performance Python wrapper for the [blart](https://github.com/declanvk/bl
 ## Installation
 
 ```bash
-pip install blart
+pip install blart-py
 ```
 
 ### Build from Source
@@ -286,7 +286,7 @@ pip install pytest pytest-cov
 pytest tests/
 
 # Run with coverage
-pytest --cov=blart tests/
+pytest --cov=blart-py tests/
 ```
 
 ### Code Quality

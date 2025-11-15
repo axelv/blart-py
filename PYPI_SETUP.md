@@ -106,7 +106,7 @@ python3.9 -m venv test_env
 source test_env/bin/activate
 
 # Install from TestPyPI
-pip install --index-url https://test.pypi.org/simple/ --no-deps blart
+pip install --index-url https://test.pypi.org/simple/ --no-deps blart-py
 
 # Test the package
 python -c "import blart; print(blart.__version__); tree = blart.TreeMap(); tree['test'] = 1; print('Success!')"
@@ -139,7 +139,7 @@ https://pypi.org/project/blart/0.1.0/
 
 ```bash
 # Install from PyPI
-pip install blart
+pip install blart-py
 
 # Test
 python -c "import blart; print(blart.__version__)"
@@ -211,8 +211,8 @@ This will automatically:
 
 ## Step 8: Post-Publication Checklist
 
-- [ ] Package visible on PyPI: https://pypi.org/project/blart/
-- [ ] Installation works: `pip install blart`
+- [ ] Package visible on PyPI: https://pypi.org/project/blart-py/
+- [ ] Installation works: `pip install blart-py`
 - [ ] Import works: `python -c "import blart"`
 - [ ] GitHub repository created and pushed
 - [ ] GitHub release created for v0.1.0
@@ -325,8 +325,8 @@ twine upload --repository testpypi dist/*
 twine upload dist/*
 
 # Install from TestPyPI
-pip install --index-url https://test.pypi.org/simple/ blart
+pip install --index-url https://test.pypi.org/simple/ blart-py
 
 # Install from PyPI
-pip install blart
+pip install blart-py
 ```

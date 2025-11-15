@@ -96,7 +96,7 @@ pip install twine
 twine upload --repository testpypi dist/*
 
 # Test installation from TestPyPI
-pip install --index-url https://test.pypi.org/simple/ blart
+pip install --index-url https://test.pypi.org/simple/ blart-py
 
 # Upload to PyPI
 twine upload dist/*
@@ -106,7 +106,7 @@ twine upload dist/*
 
 ```bash
 # Install from PyPI
-pip install blart==X.Y.Z
+pip install blart-py==X.Y.Z
 
 # Verify installation
 python -c "import blart; print(blart.__version__)"
@@ -216,7 +216,7 @@ Ensure testing on:
 
 - Verify wheel is for correct platform/Python version
 - Check for missing system dependencies
-- Try installing from source (`pip install --no-binary blart`)
+- Try installing from source (`pip install --no-binary blart-py`)
 
 ### Import Errors After Installation
 
