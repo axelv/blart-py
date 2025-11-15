@@ -101,13 +101,7 @@ def main():
     print("5. Iteration (Ordered by Key)")
     print("-" * 40)
 
-    tree = TreeMap({
-        "zebra": 26,
-        "apple": 1,
-        "mango": 13,
-        "banana": 2,
-        "cherry": 3
-    })
+    tree = TreeMap({"zebra": 26, "apple": 1, "mango": 13, "banana": 2, "cherry": 3})
 
     print("Iterating over keys (sorted):")
     for key in tree:
@@ -164,14 +158,16 @@ def main():
     print("8. Unicode Support")
     print("-" * 40)
 
-    tree = TreeMap({
-        "hello": "English",
-        "你好": "Chinese",
-        "こんにちは": "Japanese",
-        "مرحبا": "Arabic",
-        "🚀": "Rocket emoji",
-        "🐍": "Snake emoji"
-    })
+    tree = TreeMap(
+        {
+            "hello": "English",
+            "你好": "Chinese",
+            "こんにちは": "Japanese",
+            "مرحبا": "Arabic",
+            "🚀": "Rocket emoji",
+            "🐍": "Snake emoji",
+        }
+    )
 
     print("Unicode keys and values work seamlessly:")
     for key, value in tree.items():

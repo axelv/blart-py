@@ -188,8 +188,16 @@ def test_benchmark_fuzzy_search():
     # Prepare data
     tree = TreeMap()
     words = [
-        "algorithm", "data", "structure", "function", "variable",
-        "class", "object", "method", "property", "interface"
+        "algorithm",
+        "data",
+        "structure",
+        "function",
+        "variable",
+        "class",
+        "object",
+        "method",
+        "property",
+        "interface",
     ]
     for word in words:
         for i in range(n // len(words)):
@@ -358,8 +366,14 @@ def test_benchmark_unicode_performance():
     iterations = 5
 
     unicode_keys = [
-        "hello_世界", "こんにちは", "مرحبا", "привет",
-        "你好", "안녕하세요", "สวัสดี", "שלום"
+        "hello_世界",
+        "こんにちは",
+        "مرحبا",
+        "привет",
+        "你好",
+        "안녕하세요",
+        "สวัสดี",
+        "שלום",
     ]
 
     def unicode_workload():
