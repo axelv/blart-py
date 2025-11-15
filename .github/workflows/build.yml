@@ -37,6 +37,8 @@ jobs:
     - name: Build wheels (macOS)
       if: matrix.os == 'macos-latest'
       run: |
+        # Install x86_64 target for universal2 builds
+        rustup target add x86_64-apple-darwin
         maturin build --release --out dist --find-interpreter
         # Build universal2 wheel for macOS
         maturin build --release --out dist --target universal2-apple-darwin
