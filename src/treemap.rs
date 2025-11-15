@@ -1,8 +1,10 @@
-use pyo3::prelude::*;
-use pyo3::exceptions::PyKeyError;
-use pyo3::types::{PyDict, PyList};
+use crate::iterators::{
+    PyFuzzyIter, PyPrefixIter, PyTreeMapItems, PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues,
+};
 use blart::TreeMap;
-use crate::iterators::{PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues, PyTreeMapItems, PyPrefixIter, PyFuzzyIter};
+use pyo3::exceptions::PyKeyError;
+use pyo3::prelude::*;
+use pyo3::types::{PyDict, PyList};
 
 /// Calculate Levenshtein distance between two strings
 fn levenshtein_distance(s1: &str, s2: &str) -> usize {
@@ -30,13 +32,17 @@ fn levenshtein_distance(s1: &str, s2: &str) -> usize {
 
     for i in 1..=len1 {
         for j in 1..=len2 {
-            let cost = if s1_chars[i - 1] == s2_chars[j - 1] { 0 } else { 1 };
+            let cost = if s1_chars[i - 1] == s2_chars[j - 1] {
+                0
+            } else {
+                1
+            };
             matrix[i][j] = std::cmp::min(
                 std::cmp::min(
-                    matrix[i - 1][j] + 1,      // deletion
-                    matrix[i][j - 1] + 1       // insertion
+                    matrix[i - 1][j] + 1, // deletion
+                    matrix[i][j - 1] + 1, // insertion
                 ),
-                matrix[i - 1][j - 1] + cost    // substitution
+                matrix[i - 1][j - 1] + cost, // substitution
             );
         }
     }
@@ -121,7 +127,7 @@ impl PyTreeMap {
                     let tuple = item.downcast::<pyo3::types::PyTuple>()?;
                     if tuple.len() != 2 {
                         return Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
-                            "Items must be (key, value) tuples"
+                            "Items must be (key, value) tuples",
                         ));
                     }
                     let key_str: String = tuple.get_item(0)?.extract()?;
@@ -172,7 +178,12 @@ impl PyTreeMap {
     ///     >>> tree.get("missing", "default")
     ///     'default'
     #[pyo3(signature = (key, default=None))]
-    fn get(&self, py: Python, key: String, default: Option<PyObject>) -> PyResult<Option<PyObject>> {
+    fn get(
+        &self,
+        py: Python,
+        key: String,
+        default: Option<PyObject>,
+    ) -> PyResult<Option<PyObject>> {
         let key_bytes = key.as_bytes();
         match self.inner.get(key_bytes) {
             Some(value) => Ok(Some(value.clone_ref(py))),
@@ -317,7 +328,8 @@ impl PyTreeMap {
     ///     >>> list(tree)
     ///     ['a', 'b', 'c']
     fn __iter__(&self, _py: Python) -> PyResult<PyTreeMapIter> {
-        let keys: Vec<String> = self.inner
+        let keys: Vec<String> = self
+            .inner
             .iter()
             .map(|(k, _)| String::from_utf8_lossy(k).into_owned())
             .collect();
@@ -334,7 +346,8 @@ impl PyTreeMap {
     ///     >>> list(tree.keys())
     ///     ['a', 'b', 'c']
     fn keys(&self, _py: Python) -> PyResult<PyTreeMapKeys> {
-        let keys: Vec<String> = self.inner
+        let keys: Vec<String> = self
+            .inner
             .iter()
             .map(|(k, _)| String::from_utf8_lossy(k).into_owned())
             .collect();
@@ -351,10 +364,7 @@ impl PyTreeMap {
     ///     >>> list(tree.values())
     ///     [1, 2, 3]
     fn values(&self, py: Python) -> PyResult<PyTreeMapValues> {
-        let values: Vec<PyObject> = self.inner
-            .iter()
-            .map(|(_, v)| v.clone_ref(py))
-            .collect();
+        let values: Vec<PyObject> = self.inner.iter().map(|(_, v)| v.clone_ref(py)).collect();
         Ok(PyTreeMapValues::new(values))
     }
 
@@ -368,7 +378,8 @@ impl PyTreeMap {
     ///     >>> list(tree.items())
     ///     [('a', 1), ('c', 3)]
     fn items(&self, py: Python) -> PyResult<PyTreeMapItems> {
-        let items: Vec<(String, PyObject)> = self.inner
+        let items: Vec<(String, PyObject)> = self
+            .inner
             .iter()
             .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
             .collect();
@@ -426,7 +437,8 @@ impl PyTreeMap {
     ///     [('apple', 1), ('application', 2), ('apply', 3), ('banana', 4)]
     fn prefix_iter(&self, py: Python, prefix: String) -> PyResult<PyPrefixIter> {
         let prefix_bytes = prefix.as_bytes();
-        let items: Vec<(String, PyObject)> = self.inner
+        let items: Vec<(String, PyObject)> = self
+            .inner
             .prefix(prefix_bytes)
             .map(|(k, v)| (String::from_utf8_lossy(k).into_owned(), v.clone_ref(py)))
             .collect();
@@ -566,7 +578,8 @@ impl PyTreeMap {
     ///     2
     fn fuzzy_search(&self, py: Python, key: String, max_distance: usize) -> PyResult<PyFuzzyIter> {
         let key_bytes = key.as_bytes();
-        let items: Vec<(String, PyObject, usize)> = self.inner
+        let items: Vec<(String, PyObject, usize)> = self
+            .inner
             .fuzzy(key_bytes, max_distance)
             .map(|(k, v)| {
                 let key_str = String::from_utf8_lossy(k).into_owned();
