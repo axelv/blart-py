@@ -39,8 +39,13 @@ jobs:
     - name: Build wheel
       run: maturin build --release
 
-    - name: Install wheel
+    - name: Install wheel (Unix)
+      if: runner.os != 'Windows'
       run: pip install target/wheels/*.whl
+
+    - name: Install wheel (Windows)
+      if: runner.os == 'Windows'
+      run: pip install --find-links=target/wheels --no-index blart
 
     - name: Run tests
       run: pytest tests/ -v --cov=blart --cov-report=xml
