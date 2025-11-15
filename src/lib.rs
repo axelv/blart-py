@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 
-mod treemap;
 mod iterators;
+mod treemap;
 
 #[pymodule]
 fn _blart(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
