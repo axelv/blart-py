@@ -85,8 +85,8 @@ def test_special_unicode_characters():
         "hello\rworld",  # Carriage return
         "hello\0world",  # Null character
         "hello\\world",  # Backslash
-        "hello\"world",  # Quote
-        "hello'world",   # Single quote
+        'hello"world',  # Quote
+        "hello'world",  # Single quote
     ]
 
     for i, key in enumerate(special_keys):

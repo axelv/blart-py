@@ -17,14 +17,9 @@ def main():
     print("1. Basic Fuzzy Search")
     print("-" * 40)
 
-    tree = TreeMap({
-        "hello": 1,
-        "hallo": 2,
-        "hullo": 3,
-        "help": 4,
-        "world": 5,
-        "word": 6
-    })
+    tree = TreeMap(
+        {"hello": 1, "hallo": 2, "hullo": 3, "help": 4, "world": 5, "word": 6}
+    )
 
     print("All entries in tree:")
     for key, value in tree.items():
@@ -59,14 +54,16 @@ def main():
     print("  - Substitutions: 'cat' -> 'bat' (distance=1)")
     print()
 
-    examples = TreeMap({
-        "cat": "feline",
-        "cats": "felines",
-        "bat": "flying mammal",
-        "rat": "rodent",
-        "hat": "headwear",
-        "car": "vehicle"
-    })
+    examples = TreeMap(
+        {
+            "cat": "feline",
+            "cats": "felines",
+            "bat": "flying mammal",
+            "rat": "rodent",
+            "hat": "headwear",
+            "car": "vehicle",
+        }
+    )
 
     search_term = "cat"
     print(f"Fuzzy search for '{search_term}' (max_distance=1):")
@@ -79,15 +76,17 @@ def main():
     print("3. Real-World Use Case: Spell Checking")
     print("-" * 40)
 
-    dictionary = TreeMap({
-        "python": "A programming language",
-        "program": "A set of instructions",
-        "programming": "The act of writing programs",
-        "programmer": "One who writes programs",
-        "function": "A reusable block of code",
-        "variable": "A named storage location",
-        "algorithm": "A step-by-step procedure"
-    })
+    dictionary = TreeMap(
+        {
+            "python": "A programming language",
+            "program": "A set of instructions",
+            "programming": "The act of writing programs",
+            "programmer": "One who writes programs",
+            "function": "A reusable block of code",
+            "variable": "A named storage location",
+            "algorithm": "A step-by-step procedure",
+        }
+    )
 
     def spell_check(word, max_distance=2):
         """Check spelling and suggest corrections."""
@@ -122,13 +121,15 @@ def main():
     print("4. Real-World Use Case: Name Matching")
     print("-" * 40)
 
-    users = TreeMap({
-        "john_smith": {"email": "john@example.com", "id": 1},
-        "jane_smith": {"email": "jane@example.com", "id": 2},
-        "jon_smyth": {"email": "jon@example.com", "id": 3},
-        "alice_jones": {"email": "alice@example.com", "id": 4},
-        "bob_johnson": {"email": "bob@example.com", "id": 5}
-    })
+    users = TreeMap(
+        {
+            "john_smith": {"email": "john@example.com", "id": 1},
+            "jane_smith": {"email": "jane@example.com", "id": 2},
+            "jon_smyth": {"email": "jon@example.com", "id": 3},
+            "alice_jones": {"email": "alice@example.com", "id": 4},
+            "bob_johnson": {"email": "bob@example.com", "id": 5},
+        }
+    )
 
     def find_user(name, tolerance=2):
         """Find users with similar names."""
@@ -150,17 +151,19 @@ def main():
     print("5. Real-World Use Case: Command Correction")
     print("-" * 40)
 
-    commands = TreeMap({
-        "list": "List items",
-        "load": "Load file",
-        "save": "Save file",
-        "search": "Search items",
-        "delete": "Delete item",
-        "create": "Create item",
-        "update": "Update item",
-        "export": "Export data",
-        "import": "Import data"
-    })
+    commands = TreeMap(
+        {
+            "list": "List items",
+            "load": "Load file",
+            "save": "Save file",
+            "search": "Search items",
+            "delete": "Delete item",
+            "create": "Create item",
+            "update": "Update item",
+            "export": "Export data",
+            "import": "Import data",
+        }
+    )
 
     def suggest_command(user_input, max_distance=2):
         """Suggest corrections for mistyped commands."""
@@ -187,15 +190,17 @@ def main():
     print("6. Real-World Use Case: Product Search")
     print("-" * 40)
 
-    products = TreeMap({
-        "iphone_13": {"price": 799, "stock": 50},
-        "iphone_14": {"price": 899, "stock": 30},
-        "iphone_15": {"price": 999, "stock": 20},
-        "samsung_galaxy": {"price": 849, "stock": 40},
-        "samsung_note": {"price": 949, "stock": 15},
-        "macbook_pro": {"price": 1999, "stock": 10},
-        "macbook_air": {"price": 1299, "stock": 25}
-    })
+    products = TreeMap(
+        {
+            "iphone_13": {"price": 799, "stock": 50},
+            "iphone_14": {"price": 899, "stock": 30},
+            "iphone_15": {"price": 999, "stock": 20},
+            "samsung_galaxy": {"price": 849, "stock": 40},
+            "samsung_note": {"price": 949, "stock": 15},
+            "macbook_pro": {"price": 1999, "stock": 10},
+            "macbook_air": {"price": 1299, "stock": 25},
+        }
+    )
 
     def search_products(query, max_distance=3):
         """Search products with fuzzy matching."""
@@ -212,23 +217,27 @@ def main():
         if results:
             print("  Found products:")
             for name, info, distance in results[:3]:
-                print(f"    {name:20} ${info['price']:4} (match quality: {3-distance}/3)")
+                print(
+                    f"    {name:20} ${info['price']:4} (match quality: {3-distance}/3)"
+                )
         print()
 
     # ===== Combining Prefix and Fuzzy Search =====
     print("7. Combining Prefix and Fuzzy Search")
     print("-" * 40)
 
-    cities = TreeMap({
-        "new_york": "USA",
-        "new_delhi": "India",
-        "new_orleans": "USA",
-        "newcastle": "UK",
-        "san_francisco": "USA",
-        "san_diego": "USA",
-        "santa_monica": "USA",
-        "los_angeles": "USA"
-    })
+    cities = TreeMap(
+        {
+            "new_york": "USA",
+            "new_delhi": "India",
+            "new_orleans": "USA",
+            "newcastle": "UK",
+            "san_francisco": "USA",
+            "san_diego": "USA",
+            "santa_monica": "USA",
+            "los_angeles": "USA",
+        }
+    )
 
     # First filter by prefix, then apply fuzzy matching on user input
     def smart_search(query, prefix=None, max_distance=2):
@@ -265,9 +274,21 @@ def main():
     # Create a larger tree
     large_tree = TreeMap()
     words = [
-        "algorithm", "data", "structure", "function", "variable",
-        "class", "object", "method", "property", "interface",
-        "implementation", "abstract", "concrete", "inherit", "polymorphism"
+        "algorithm",
+        "data",
+        "structure",
+        "function",
+        "variable",
+        "class",
+        "object",
+        "method",
+        "property",
+        "interface",
+        "implementation",
+        "abstract",
+        "concrete",
+        "inherit",
+        "polymorphism",
     ]
 
     for i in range(1000):

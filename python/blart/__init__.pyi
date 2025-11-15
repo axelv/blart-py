@@ -25,17 +25,14 @@ class TreeMap:
     def __init__(self) -> None:
         """Create an empty TreeMap."""
         ...
-
     @overload
     def __init__(self, data: Dict[str, Any]) -> None:
         """Create a TreeMap from a dictionary."""
         ...
-
     @overload
     def __init__(self, data: Iterable[Tuple[str, Any]]) -> None:
         """Create a TreeMap from an iterable of (key, value) tuples."""
         ...
-
     def insert(self, key: str, value: Any) -> None:
         """Insert or update a key-value pair.
 
@@ -44,7 +41,6 @@ class TreeMap:
             value: The value to associate with the key
         """
         ...
-
     def get(self, key: str, default: Optional[Any] = None) -> Optional[Any]:
         """Get a value by key with optional default.
 
@@ -56,7 +52,6 @@ class TreeMap:
             The value associated with the key, or default if not found
         """
         ...
-
     def remove(self, key: str) -> Any:
         """Remove a key and return its value.
 
@@ -70,11 +65,9 @@ class TreeMap:
             KeyError: If the key does not exist
         """
         ...
-
     def clear(self) -> None:
         """Remove all entries from the TreeMap."""
         ...
-
     def is_empty(self) -> bool:
         """Check if the TreeMap is empty.
 
@@ -82,7 +75,6 @@ class TreeMap:
             True if the TreeMap has no entries, False otherwise
         """
         ...
-
     def __getitem__(self, key: str) -> Any:
         """Get a value using square bracket notation.
 
@@ -96,7 +88,6 @@ class TreeMap:
             KeyError: If the key does not exist
         """
         ...
-
     def __setitem__(self, key: str, value: Any) -> None:
         """Set a value using square bracket notation.
 
@@ -105,7 +96,6 @@ class TreeMap:
             value: The value to associate with the key
         """
         ...
-
     def __delitem__(self, key: str) -> None:
         """Delete a key using del statement.
 
@@ -116,7 +106,6 @@ class TreeMap:
             KeyError: If the key does not exist
         """
         ...
-
     def __contains__(self, key: str) -> bool:
         """Check if a key exists using 'in' operator.
 
@@ -127,7 +116,6 @@ class TreeMap:
             True if the key exists, False otherwise
         """
         ...
-
     def __len__(self) -> int:
         """Get the number of entries in the TreeMap.
 
@@ -135,15 +123,12 @@ class TreeMap:
             The number of key-value pairs
         """
         ...
-
     def __repr__(self) -> str:
         """Get a debug string representation."""
         ...
-
     def __str__(self) -> str:
         """Get a human-readable string representation."""
         ...
-
     def __iter__(self) -> Iterator[str]:
         """Iterate over keys in the TreeMap.
 
@@ -151,7 +136,6 @@ class TreeMap:
             An iterator over the keys in lexicographic order
         """
         ...
-
     def keys(self) -> Iterator[str]:
         """Get an iterator over keys.
 
@@ -159,7 +143,6 @@ class TreeMap:
             An iterator over the keys in lexicographic order
         """
         ...
-
     def values(self) -> Iterator[Any]:
         """Get an iterator over values.
 
@@ -167,7 +150,6 @@ class TreeMap:
             An iterator over the values in key order
         """
         ...
-
     def items(self) -> Iterator[Tuple[str, Any]]:
         """Get an iterator over (key, value) pairs.
 
@@ -175,7 +157,6 @@ class TreeMap:
             An iterator over (key, value) tuples in key order
         """
         ...
-
     def get_prefix(self, prefix: str) -> Optional[Tuple[str, Any]]:
         """Get the first key-value pair matching a prefix.
 
@@ -206,7 +187,6 @@ class TreeMap:
             remove the shorter prefix key. This is expected behavior.
         """
         ...
-
     def prefix_iter(self, prefix: str) -> Iterator[Tuple[str, Any]]:
         """Get an iterator over all key-value pairs with a given prefix.
 
@@ -239,7 +219,6 @@ class TreeMap:
             An empty prefix ("") matches all keys in the tree.
         """
         ...
-
     def first(self) -> Optional[Tuple[str, Any]]:
         """Get the first (minimum) key-value pair.
 
@@ -260,7 +239,6 @@ class TreeMap:
             None
         """
         ...
-
     def last(self) -> Optional[Tuple[str, Any]]:
         """Get the last (maximum) key-value pair.
 
@@ -281,7 +259,6 @@ class TreeMap:
             None
         """
         ...
-
     def pop_first(self) -> Optional[Tuple[str, Any]]:
         """Remove and return the first (minimum) key-value pair.
 
@@ -305,7 +282,6 @@ class TreeMap:
             False
         """
         ...
-
     def pop_last(self) -> Optional[Tuple[str, Any]]:
         """Remove and return the last (maximum) key-value pair.
 
@@ -329,8 +305,9 @@ class TreeMap:
             False
         """
         ...
-
-    def fuzzy_search(self, key: str, max_distance: int) -> Iterator[Tuple[str, Any, int]]:
+    def fuzzy_search(
+        self, key: str, max_distance: int
+    ) -> Iterator[Tuple[str, Any, int]]:
         """Fuzzy search for keys within a Levenshtein distance threshold.
 
         Returns an iterator that yields (key, value, distance) tuples for all keys

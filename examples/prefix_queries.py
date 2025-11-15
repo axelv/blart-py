@@ -17,16 +17,18 @@ def main():
     print("1. Basic Prefix Queries")
     print("-" * 40)
 
-    tree = TreeMap({
-        "apple": 1,
-        "application": 2,
-        "apply": 3,
-        "apricot": 4,
-        "banana": 5,
-        "band": 6,
-        "bandana": 7,
-        "cherry": 8
-    })
+    tree = TreeMap(
+        {
+            "apple": 1,
+            "application": 2,
+            "apply": 3,
+            "apricot": 4,
+            "banana": 5,
+            "band": 6,
+            "bandana": 7,
+            "cherry": 8,
+        }
+    )
 
     print("All entries in tree:")
     for key, value in tree.items():
@@ -79,18 +81,20 @@ def main():
     print("-" * 40)
 
     # Build a command tree
-    commands = TreeMap({
-        "list": "List all items",
-        "list-users": "List all users",
-        "list-files": "List all files",
-        "load": "Load configuration",
-        "load-config": "Load config file",
-        "save": "Save current state",
-        "save-config": "Save config file",
-        "search": "Search for items",
-        "search-by-name": "Search by name",
-        "search-by-date": "Search by date"
-    })
+    commands = TreeMap(
+        {
+            "list": "List all items",
+            "list-users": "List all users",
+            "list-files": "List all files",
+            "load": "Load configuration",
+            "load-config": "Load config file",
+            "save": "Save current state",
+            "save-config": "Save config file",
+            "search": "Search for items",
+            "search-by-name": "Search by name",
+            "search-by-date": "Search by date",
+        }
+    )
 
     # Simulate command completion
     user_input = "li"
@@ -112,18 +116,20 @@ def main():
     print("-" * 40)
 
     # Dictionary of programming languages
-    languages = TreeMap({
-        "python": "High-level programming language",
-        "javascript": "Web programming language",
-        "java": "Enterprise programming language",
-        "julia": "Scientific computing language",
-        "rust": "Systems programming language",
-        "ruby": "Dynamic programming language",
-        "go": "Concurrent programming language",
-        "c": "Low-level programming language",
-        "c++": "Object-oriented systems language",
-        "c#": "Microsoft's programming language"
-    })
+    languages = TreeMap(
+        {
+            "python": "High-level programming language",
+            "javascript": "Web programming language",
+            "java": "Enterprise programming language",
+            "julia": "Scientific computing language",
+            "rust": "Systems programming language",
+            "ruby": "Dynamic programming language",
+            "go": "Concurrent programming language",
+            "c": "Low-level programming language",
+            "c++": "Object-oriented systems language",
+            "c#": "Microsoft's programming language",
+        }
+    )
 
     def autocomplete(prefix, max_results=5):
         """Show autocomplete suggestions."""
@@ -153,16 +159,18 @@ def main():
     print("6. Real-World Use Case: File System Paths")
     print("-" * 40)
 
-    filesystem = TreeMap({
-        "/home/user/documents/report.pdf": 1024,
-        "/home/user/documents/notes.txt": 256,
-        "/home/user/downloads/file.zip": 2048,
-        "/home/user/downloads/image.png": 512,
-        "/home/admin/config.yml": 128,
-        "/var/log/system.log": 4096,
-        "/var/log/error.log": 1024,
-        "/usr/bin/python": 8192
-    })
+    filesystem = TreeMap(
+        {
+            "/home/user/documents/report.pdf": 1024,
+            "/home/user/documents/notes.txt": 256,
+            "/home/user/downloads/file.zip": 2048,
+            "/home/user/downloads/image.png": 512,
+            "/home/admin/config.yml": 128,
+            "/var/log/system.log": 4096,
+            "/var/log/error.log": 1024,
+            "/usr/bin/python": 8192,
+        }
+    )
 
     def list_directory(path_prefix):
         """List all files under a path prefix."""
@@ -185,16 +193,18 @@ def main():
     print("7. Real-World Use Case: URL Routing")
     print("-" * 40)
 
-    routes = TreeMap({
-        "/api/users": "List users",
-        "/api/users/create": "Create user",
-        "/api/users/delete": "Delete user",
-        "/api/products": "List products",
-        "/api/products/search": "Search products",
-        "/admin": "Admin dashboard",
-        "/admin/users": "Manage users",
-        "/admin/settings": "System settings"
-    })
+    routes = TreeMap(
+        {
+            "/api/users": "List users",
+            "/api/users/create": "Create user",
+            "/api/users/delete": "Delete user",
+            "/api/products": "List products",
+            "/api/products/search": "Search products",
+            "/admin": "Admin dashboard",
+            "/admin/users": "Manage users",
+            "/admin/settings": "System settings",
+        }
+    )
 
     def find_routes(path_prefix):
         """Find all routes matching a prefix."""

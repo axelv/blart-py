@@ -6,6 +6,7 @@ from blart import TreeMap
 
 # Boundary operation tests
 
+
 def test_first():
     """Test getting the first key-value pair."""
     tree = TreeMap()
@@ -138,6 +139,7 @@ def test_boundary_operations_with_unicode():
 
 
 # Fuzzy search tests
+
 
 def test_fuzzy_search_exact_match():
     """Test fuzzy search with exact match (distance 0)."""

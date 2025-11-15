@@ -42,7 +42,7 @@ def find_description_files(rf2_path: Path) -> Dict[str, Path]:
         path = Path(file_path)
         # Extract language code from filename
         # Format: sct2_Description_Snapshot-{lang}_{rest}.txt
-        match = re.search(r'sct2_Description_Snapshot-([a-z]{2})_', path.name)
+        match = re.search(r"sct2_Description_Snapshot-([a-z]{2})_", path.name)
         if match:
             lang_code = match.group(1)
             description_files[lang_code] = path
@@ -63,12 +63,12 @@ def load_description_file(file_path: Path) -> TreeMap:
     tree = TreeMap()
     count = 0
 
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         # Skip header line
         next(f)
 
         for line in f:
-            fields = line.strip().split('\t')
+            fields = line.strip().split("\t")
             if len(fields) >= 9:
                 # Column 5 (index 4) = conceptId
                 # Column 8 (index 7) = term
@@ -147,6 +147,7 @@ class SnomedCLI:
 
         # Save history on exit
         import atexit
+
         atexit.register(self.save_history)
 
     def save_history(self) -> None:
@@ -167,22 +168,22 @@ class SnomedCLI:
                 user_input = input(prompt).strip()
 
                 # Handle exit commands
-                if user_input.lower() in ('quit', 'exit', 'q'):
+                if user_input.lower() in ("quit", "exit", "q"):
                     print("Goodbye!")
                     break
 
                 # Handle help command
-                if user_input.lower() in ('help', '?'):
+                if user_input.lower() in ("help", "?"):
                     self.print_help()
                     continue
 
                 # Handle stats command
-                if user_input.lower() == 'stats':
+                if user_input.lower() == "stats":
                     self.print_stats()
                     continue
 
                 # Handle language switching command
-                if user_input.lower() == 'lang':
+                if user_input.lower() == "lang":
                     self.switch_language()
                     continue
 
@@ -291,7 +292,9 @@ class SnomedCLI:
 
         # Display prefix matches
         if prefix_matches:
-            print(f"Prefix matches: {len(prefix_matches)} found in {prefix_elapsed:.2f}ms")
+            print(
+                f"Prefix matches: {len(prefix_matches)} found in {prefix_elapsed:.2f}ms"
+            )
             print("-" * 60)
             for i, (match_term, concept_id) in enumerate(prefix_matches[:10], 1):
                 print(f"  {i:2}. {match_term}")
@@ -307,9 +310,13 @@ class SnomedCLI:
         # Display fuzzy matches
         print()  # Blank line between sections
         if unique_fuzzy_matches:
-            print(f"Fuzzy matches (edit distance ≤ 2): {len(unique_fuzzy_matches)} found in {fuzzy_elapsed:.2f}ms")
+            print(
+                f"Fuzzy matches (edit distance ≤ 2): {len(unique_fuzzy_matches)} found in {fuzzy_elapsed:.2f}ms"
+            )
             print("-" * 60)
-            for i, (match_term, concept_id, distance) in enumerate(unique_fuzzy_matches[:10], 1):
+            for i, (match_term, concept_id, distance) in enumerate(
+                unique_fuzzy_matches[:10], 1
+            ):
                 print(f"  {i:2}. {match_term} (distance: {distance})")
                 print(f"      → Concept ID: {concept_id}")
 
@@ -447,6 +454,7 @@ def main() -> int:
     except Exception as e:
         print(f"Unexpected error: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
         return 1
 
