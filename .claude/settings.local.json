@@ -26,7 +26,20 @@
       "Bash(maturin build:*)",
       "Bash(pip:*)",
       "Bash(PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 maturin build:*)",
-      "Bash(python3.9 -c:*)"
+      "Bash(python3.9 -c:*)",
+      "WebFetch(domain:pymotw.com)",
+      "Bash(chmod:*)",
+      "Bash(./examples/sct-search.py:*)",
+      "Bash(git -C /Users/axelvanraes/dev/blart-py status)",
+      "Bash(git -C /Users/axelvanraes/dev/blart-py log --oneline -n 5)",
+      "Bash(.venv/bin/python:*)",
+      "WebFetch(domain:pypi.org)",
+      "Bash(cargo fmt:*)",
+      "Bash(git push:*)",
+      "Bash(cargo clippy:*)",
+      "Bash(PYO3_USE_ABI3_FORWARD_COMPATIBILITY=1 cargo clippy:*)",
+      "Bash(black:*)",
+      "Bash(ruff check:*)"
     ],
     "deny": [],
     "ask": []

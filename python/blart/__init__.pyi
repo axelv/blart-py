@@ -1,6 +1,6 @@
 """Type stubs for blart package."""
 
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union, overload
+from typing import Any, Dict, Iterable, Iterator, Optional, Tuple, overload
 
 class TreeMap:
     """Adaptive radix tree implementation using an adaptive radix tree (ART).

@@ -67,7 +67,7 @@ def main():
 
     search_term = "cat"
     print(f"Fuzzy search for '{search_term}' (max_distance=1):")
-    results = sorted(tree.fuzzy_search(search_term, 1), key=lambda x: x[2])
+    results = sorted(examples.fuzzy_search(search_term, 1), key=lambda x: x[2])
     for key, value, distance in results:
         print(f"  {key}: distance={distance}")
     print()

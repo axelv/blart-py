@@ -11,10 +11,10 @@ license = { file = "LICENSE" }
 requires-python = ">=3.8"
 keywords = ["tree", "radix", "trie", "prefix", "fuzzy-search", "data-structure"]
 authors = [
-    { name = "blart-py contributors" }
+    { name = "Axel Vanraes" }
 ]
 maintainers = [
-    { name = "blart-py contributors" }
+    { name = "Axel Vanraes" }
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -34,11 +34,11 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/blart-py"
-Documentation = "https://github.com/yourusername/blart-py#readme"
-Repository = "https://github.com/yourusername/blart-py"
-Issues = "https://github.com/yourusername/blart-py/issues"
-Changelog = "https://github.com/yourusername/blart-py/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/axelv/blart-py"
+Documentation = "https://github.com/axelv/blart-py#readme"
+Repository = "https://github.com/axelv/blart-py"
+Issues = "https://github.com/axelv/blart-py/issues"
+Changelog = "https://github.com/axelv/blart-py/blob/main/CHANGELOG.md"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]

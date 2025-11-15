@@ -28,7 +28,7 @@ Requirements:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/blart-py.git
+git clone https://github.com/axelv/blart-py.git
 cd blart-py
 
 # Create virtual environment
@@ -340,8 +340,8 @@ If you use blart-py in your research, please cite:
 ```bibtex
 @software{blart_py,
   title = {blart-py: Python bindings for blart adaptive radix tree},
-  author = {Your Name},
+  author = {Vanraes, Axel},
   year = {2024},
-  url = {https://github.com/yourusername/blart-py}
+  url = {https://github.com/axelv/blart-py}
 }
 ```
