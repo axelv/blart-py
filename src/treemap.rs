@@ -1,3 +1,5 @@
+#![allow(clippy::useless_conversion)]
+
 use crate::iterators::{
     PyFuzzyIter, PyPrefixIter, PyTreeMapItems, PyTreeMapIter, PyTreeMapKeys, PyTreeMapValues,
 };
@@ -7,6 +9,7 @@ use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList};
 
 /// Calculate Levenshtein distance between two strings
+#[allow(clippy::needless_range_loop)]
 fn levenshtein_distance(s1: &str, s2: &str) -> usize {
     let len1 = s1.chars().count();
     let len2 = s2.chars().count();
