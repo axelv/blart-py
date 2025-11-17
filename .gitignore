@@ -38,3 +38,6 @@ htmlcov/
 # Maturin
 *.pyd
 *.dll
+
+# Claude
+.claude
